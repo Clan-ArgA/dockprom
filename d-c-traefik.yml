@@ -141,7 +141,6 @@ services:
       - monitor-net
       - proxy
     labels:
-      org.label-schema.group: "monitoring"
       - "traefik.enable=true"
       - "traefik.http.routers.caddy.entrypoints=http"
       - "traefik.http.routers.caddy.rule=Host(`grafana.clanarga.com.ar`)"
@@ -154,4 +153,5 @@ services:
       - "traefik.http.routers.caddy-secure.service=caddy"
       - "traefik.http.services.caddy.loadbalancer.server.port=3000"
       - "traefik.docker.network=proxy"
+      org.label-schema.group: "monitoring"
 
