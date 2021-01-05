@@ -118,11 +118,16 @@ services:
   caddy:
     image: stefanprodan/caddy
     container_name: caddy
-    ports:
-      - "5000:3000"
-      - "9090:9090"
-      - "9093:9093"
-      - "9091:9091"
+    # ports:
+    #   - "5000:3000"
+    #   - "9090:9090"
+    #   - "9093:9093"
+    #   - "9091:9091"
+    expose:
+      - 3000
+      - 9090
+      - 9093
+      - 9091
     volumes:
       - ./caddy:/etc/caddy
       - /etc/localtime:/etc/localtime:ro
