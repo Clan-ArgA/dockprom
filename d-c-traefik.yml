@@ -3,6 +3,8 @@ version: '2.1'
 networks:
   monitor-net:
     driver: bridge
+  proxy:
+    external: true
 
 volumes:
     prometheus_data: {}
@@ -116,18 +118,40 @@ services:
   caddy:
     image: stefanprodan/caddy
     container_name: caddy
-    ports:
-      - "3000:3000"
-      - "9090:9090"
-      - "9093:9093"
-      - "9091:9091"
+    # ports:
+    #   - "5000:3000"
+    #   - "9090:9090"
+    #   - "9093:9093"
+    #   - "9091:9091"
+    expose:
+      - 3000
+      - 9090
+      - 9093
+      - 9091
     volumes:
       - ./caddy:/etc/caddy
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data:/data
     environment:
       - ADMIN_USER=${ADMIN_USER:-admin}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
     restart: unless-stopped
     networks:
       - monitor-net
+      - proxy
     labels:
       org.label-schema.group: "monitoring"
+      - "traefik.enable=true"
+      - "traefik.http.routers.caddy.entrypoints=http"
+      - "traefik.http.routers.caddy.rule=Host(`grafana.clanarga.com.ar`)"
+      - "traefik.http.middlewares.caddy-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.caddy.middlewares=caddy-https-redirect"
+      - "traefik.http.routers.caddy-secure.entrypoints=https"
+      - "traefik.http.routers.caddy-secure.rule=Host(`grafana.clanarga.com.ar`)"
+      - "traefik.http.routers.caddy-secure.tls=true"
+      - "traefik.http.routers.caddy-secure.tls.certresolver=http"
+      - "traefik.http.routers.caddy-secure.service=caddy"
+      - "traefik.http.services.caddy.loadbalancer.server.port=8000"
+      - "traefik.docker.network=proxy"
+
