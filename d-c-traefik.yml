@@ -156,7 +156,7 @@ services:
       
 
       
-      - "traefik.http.routers.router1.rule=host(`grafana.clanarga.com.ar/prometheus`)"
+      - "traefik.http.routers.router1.rule=host(`panel.clanarga.com.ar`)"
       - "traefik.http.routers.router1.service=service1"
       - "traefik.http.services.service1.loadbalancer.server.port=9090"
       # - "traefik.http.routers.router2.rule=host(`service2.docker.localhost`)"
