@@ -141,6 +141,7 @@ services:
       - proxy
     labels:
       - "org.label-schema.group=monitoring"
+      # Grafana
       - "traefik.enable=true"
       - "traefik.http.routers.caddy.entrypoints=http"
       - "traefik.http.routers.caddy.rule=Host(`grafana.clanarga.com.ar`)"
@@ -153,23 +154,17 @@ services:
       - "traefik.http.routers.caddy-secure.service=caddy"
       - "traefik.http.services.caddy.loadbalancer.server.port=3000"
       - "traefik.docker.network=proxy"
-      
-      - "traefik.http.routers.router1.entrypoints=http"
-      - "traefik.http.routers.router1.rule=Host(`panel.clanarga.com.ar`)"
-      - "traefik.http.middlewares.router1-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.router1.middlewares=router1-https-redirect"
-      - "traefik.http.routers.router1-secure.entrypoints=https"
-      - "traefik.http.routers.router1-secure.rule=Host(`panel.clanarga.com.ar`)"
-      - "traefik.http.routers.router1-secure.tls=true"
-      - "traefik.http.routers.router1-secure.tls.certresolver=http"
-      - "traefik.http.routers.router1-secure.service=service1"
-      - "traefik.http.services.service1.loadbalancer.server.port=9090"
+      #Prometheus
+      - "traefik.http.routers.prometheus.entrypoints=http"
+      - "traefik.http.routers.prometheus.rule=Host(`panel.clanarga.com.ar`)"
+      - "traefik.http.middlewares.prometheus-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.prometheus.middlewares=prometheus-https-redirect"
+      - "traefik.http.routers.prometheus-secure.entrypoints=https"
+      - "traefik.http.routers.prometheus-secure.rule=Host(`panel.clanarga.com.ar`)"
+      - "traefik.http.routers.prometheus-secure.tls=true"
+      - "traefik.http.routers.prometheus-secure.tls.certresolver=http"
+      - "traefik.http.routers.prometheus-secure.service=prometheus"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
 
-      # - "traefik.http.routers.router1.entrypoints=http"
-      # - "traefik.http.routers.router1.rule=host(`panel.clanarga.com.ar`)"
-      # - "traefik.http.routers.router1.service=service1"
-      # - "traefik.http.services.service1.loadbalancer.server.port=9090"
-      # - "traefik.http.routers.router2.rule=host(`service2.docker.localhost`)"
-      # - "traefik.http.routers.router2.service=service2"
-      # - "traefik.http.services.service2.loadbalancer.server.port=8380"
+
 
