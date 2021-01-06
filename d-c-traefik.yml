@@ -155,7 +155,7 @@ services:
       - "traefik.docker.network=proxy"
       
 
-      
+      - "traefik.http.routers.router1.entrypoints=http"
       - "traefik.http.routers.router1.rule=host(`panel.clanarga.com.ar`)"
       - "traefik.http.routers.router1.service=service1"
       - "traefik.http.services.service1.loadbalancer.server.port=9090"
