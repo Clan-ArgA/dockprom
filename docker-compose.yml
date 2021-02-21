@@ -31,7 +31,7 @@ services:
     networks:
       - monitor-net
     labels:
-      org.label-schema.group: "monitoring"
+      - "org.label-schema.group: monitoring"
 
   alertmanager:
     image: prom/alertmanager:v0.21.0
@@ -137,5 +137,10 @@ services:
       - traefik.http.routers.grafana.rule=Host(`grafana.clanarga.com.ar`)
       - traefik.http.routers.grafana.tls=true
       - traefik.http.routers.grafana.tls.certresolver=lets-encrypt
-      - traefik.port=3000
-
+      - traefik.http.routers.grafana.service=grafana
+      - traefik.http.services.grafana.loadbalancer.server.port=3000
+      - traefik.http.routers.prometheus.rule=Host(`prometheus.clanarga.com.ar`)
+      - traefik.http.routers.prometheus.tls=true
+      - traefik.http.routers.prometheus.tls.certresolver=lets-encrypt
+      - traefik.http.routers.prometheus.service=prometheus
+      - traefik.http.services.prometheus.loadbalancer.server.port=9090

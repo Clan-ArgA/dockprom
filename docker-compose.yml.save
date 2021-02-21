@@ -3,20 +3,21 @@ version: '2.1'
 networks:
   monitor-net:
     driver: bridge
-  proxy:
+  web:
     external: true
 
 volumes:
-    prometheus_data_traefik: {}
-    grafana_data_traefik: {}
+    prometheus_data: {}
+    grafana_data: {}
 
 services:
+
   prometheus:
     image: prom/prometheus:v2.23.0
     container_name: prometheus
     volumes:
       - ./prometheus:/etc/prometheus
-      - prometheus_data_traefik:/prometheus
+      - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -89,7 +90,7 @@ services:
     image: grafana/grafana:7.3.6
     container_name: grafana
     volumes:
-      - grafana_data_traefik:/var/lib/grafana
+      - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
     environment:
       - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
@@ -117,54 +118,31 @@ services:
   caddy:
     image: stefanprodan/caddy
     container_name: caddy
-    # ports:
-    #   - "5000:3000"
-    #   - "9090:9090"
-    #   - "9093:9093"
-    #   - "9091:9091"
-    expose:
-      - 3000
-      - 9090
-      - 9093
-      - 9091
+    ports:
+      - "5000:3000"
+      - "9090:9090"
+      - "9093:9093"
+      - "9091:9091"
     volumes:
       - ./caddy:/etc/caddy
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./data:/data
     environment:
       - ADMIN_USER=${ADMIN_USER:-admin}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
     restart: on-failure
     networks:
       - monitor-net
-      - proxy
+      - web
     labels:
-      - "org.label-schema.group=monitoring"
-      # Grafana
-      - "traefik.enable=true"
-      - "traefik.http.routers.caddy.entrypoints=http"
-      - "traefik.http.routers.caddy.rule=Host(`grafana.clanarga.com.ar`)"
-      - "traefik.http.middlewares.caddy-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.caddy.middlewares=caddy-https-redirect"
-      - "traefik.http.routers.caddy-secure.entrypoints=https"
-      - "traefik.http.routers.caddy-secure.rule=Host(`grafana.clanarga.com.ar`)"
-      - "traefik.http.routers.caddy-secure.tls=true"
-      - "traefik.http.routers.caddy-secure.tls.certresolver=http"
-      - "traefik.http.routers.caddy-secure.service=caddy"
-      - "traefik.http.services.caddy.loadbalancer.server.port=3000"
-      - "traefik.docker.network=proxy"
-      #Prometheus
-      - "traefik.http.routers.prometheus.entrypoints=http"
-      - "traefik.http.routers.prometheus.rule=Host(`panel.clanarga.com.ar`)"
-      - "traefik.http.middlewares.prometheus-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.prometheus.middlewares=prometheus-https-redirect"
-      - "traefik.http.routers.prometheus-secure.entrypoints=https"
-      - "traefik.http.routers.prometheus-secure.rule=Host(`panel.clanarga.com.ar`)"
-      - "traefik.http.routers.prometheus-secure.tls=true"
-      - "traefik.http.routers.prometheus-secure.tls.certresolver=http"
-      - "traefik.http.routers.prometheus-secure.service=prometheus"
-      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
-
-
+      - "org.label-schema.group: monitoring"
+      - traefik.http.routers.grafana.rule=Host(`grafana.clanarga.com.ar`)
+      - traefik.http.routers.grafana.tls=true
+      - traefik.http.routers.grafana.tls.certresolver=lets-encrypt
+      - traefik.port=3000
+      - traefik.http.routers.      - traefik.http.routers.grafana.rule=Host(`grafana.clanarga.com.ar`)
+      - traefik.http.routers.grafana.tls=true
+      - traefik.http.routers.grafana.tls.certresolver=lets-encrypt
+      - traefik.port=3000.rule=Host(`grafana.clanarga.com.ar`)
+      - traefik.http.routers.grafana.tls=true
+      - traefik.http.routers.grafana.tls.certresolver=lets-encrypt
+      - traefik.port=3000
 
